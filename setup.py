@@ -5,12 +5,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="flaskFormRequest",
-    version="0.0.1",
+    version="0.0.2",
     author="edcilo",
     description="Request validator for flask",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
+    exclude=["test"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -18,7 +19,7 @@ setuptools.setup(
     ],
     python_requires='>=3.9',
     py_modules=["flaskFormRequest"],
-    package_dir={'':'./'},
+    include_package_data=True,
     install_requires=[
         'flask',
     ],
