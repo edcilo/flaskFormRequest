@@ -6,6 +6,7 @@ from flaskFormRequest.validators import (
     Between,
     Boolean,
     Confirmed,
+    CurrentPassword,
     ValidationError,
     StopValidation
 )
@@ -138,6 +139,25 @@ def test_confirmed():
 
     try:
         confirmed("secret", 'password', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_current_password():
+    class User:
+        def verify_password(self, password):
+            return "secret" == password
+    user = User()
+
+    cp = CurrentPassword(user)
+    assert cp("secret", "password", {}, request) == "secret"
+
+    message = 'La contraseña es incorrecta'
+    cp = CurrentPassword(user, message=message)
+
+    try:
+        cp("secreto", 'password', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message
