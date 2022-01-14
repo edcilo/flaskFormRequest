@@ -8,7 +8,7 @@ class AlphaDash(Validator):
         self.parse = parse
         self.message = message or 'This field must only contain letters, numbers, dashes and underscores.'
 
-    def handler(self, value, request):
+    def handler(self, value, field, request):
         value = str(value)
         if not re.match('^[\w-]+$', value):
             raise ValidationError(self.message)

@@ -7,7 +7,7 @@ class Alpha(Validator):
         self.parse = parse
         self.message = message or 'This field must only contain letters.'
 
-    def handler(self, value, request):
+    def handler(self, value, field, request):
         value = str(value)
         if not value.isalpha():
             raise ValidationError(self.message)

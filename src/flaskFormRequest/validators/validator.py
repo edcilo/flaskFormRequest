@@ -14,6 +14,7 @@ class StopValidation(Exception):
 
 class Validator(abc.ABC):
     def __init__(self, message: Union[str, None] = None, parse: bool = True) -> None:
+        self.data = {}
         self.parse = parse
         self.message = message or 'This field is invalid'
 
@@ -21,11 +22,13 @@ class Validator(abc.ABC):
         return value
 
     @abc.abstractmethod
-    def handler(self, value, request):
+    def handler(self, value, field, request):
         pass
 
-    def __call__(self, value, request):
+    def __call__(self, value, field, data, request):
+        self.data = data
+        self.field = field
         self.value = value
         self.request = request
-        self.handler(self.value, self.request)
+        self.handler(self.value, self.field, self.request)
         return self.parse_data(self.value) if self.parse else self.value

@@ -7,6 +7,6 @@ class Required(Validator):
         self.parse = parse
         self.message = message or 'This field is required'
 
-    def handler(self, value, request):
+    def handler(self, value, field, request):
         if value is None or len(value) == 0:
             raise StopValidation(self.message)

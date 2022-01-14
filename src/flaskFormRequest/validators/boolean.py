@@ -19,6 +19,6 @@ class Boolean(Validator):
         else:
             return value
 
-    def handler(self, value, request):
+    def handler(self, value, field, request):
         if not value in self.true_types and not value in self.false_types:
             raise ValidationError(self.message)

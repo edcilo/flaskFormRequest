@@ -8,6 +8,6 @@ class Size(Validator):
         self.size = length
         self.message = message or 'The :attribute must be :size characters.'
 
-    def handler(self, value, request):
+    def handler(self, value, field, request):
         if len(value) != self.size:
             raise ValidationError(self.message)

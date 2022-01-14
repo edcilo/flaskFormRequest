@@ -12,6 +12,6 @@ class Accepted(Validator):
     def parse_data(self, value):
         return value in self.accepted
 
-    def handler(self, value, request):
+    def handler(self, value, field, request):
         if value not in self.accepted:
             raise ValidationError(self.message)

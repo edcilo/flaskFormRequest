@@ -8,7 +8,7 @@ class AlphaNum(Validator):
         self.parse = parse
         self.message = message or 'This field must only contain letters and numbers.'
 
-    def handler(self, value, request):
+    def handler(self, value, field, request):
         value = str(value)
         if not value.isalnum():
             raise ValidationError(self.message)

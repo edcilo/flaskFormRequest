@@ -12,7 +12,7 @@ class Between(Validator):
         self.min = min
         self.max = max
 
-    def handler(self, value, request):
+    def handler(self, value, field, request):
         has_error = False
         if isinstance(value, str) or isinstance(value, list):
             has_error = len(value) < self.min or len(value) > self.max
