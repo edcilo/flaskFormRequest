@@ -1,16 +1,16 @@
 import setuptools
 
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="flaskFormRequest",
-    version="0.0.2",
+    name="flask-FormRequest",
+    version="0.0.11",
     author="edcilo",
     description="Request validator for flask",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=['flaskFormRequest'],
     exclude=["test"],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -19,5 +19,6 @@ setuptools.setup(
     ],
     python_requires='>=3.8',
     include_package_data=True,
+    packages=['flaskFormRequest', 'flaskFormRequest.filters', 'flaskFormRequest.validators'],
     package_dir={'':'src'},
 )

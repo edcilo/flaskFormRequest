@@ -1,5 +1,5 @@
 import abc
-from typing import Any
+from typing import Any, Union
 
 
 class ValidationError(ValueError):
@@ -13,11 +13,19 @@ class StopValidation(Exception):
 
 
 class Validator(abc.ABC):
-    message = 'This field is invalid'
+    def __init__(self, message: Union[str, None] = None, parse: bool = True) -> None:
+        self.parse = parse
+        self.message = message or 'This field is invalid'
 
     def parse_data(self, value: Any) -> Any:
         return value
 
     @abc.abstractmethod
-    def __call__(self, request, value):
+    def handler(self, value, request):
         pass
+
+    def __call__(self, value, request):
+        self.value = value
+        self.request = request
+        self.handler(self.value, self.request)
+        return self.parse_data(self.value) if self.parse else self.value

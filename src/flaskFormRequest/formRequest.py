@@ -47,7 +47,7 @@ class FormRequest(abc.ABC):
             errors = []
             for validator in validators:
                 try:
-                    new_val = validator(self.request, self._data.get(field))
+                    new_val = validator(self._data.get(field), self.request)
                     self._data[field] = new_val
                 except StopValidation as err:
                     errors.append(str(err))
