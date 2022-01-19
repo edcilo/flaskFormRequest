@@ -1,12 +1,19 @@
+from datetime import datetime
+from email import message
 from flaskFormRequest.validators import (
     Accepted,
+    After,
+    AfterOrEqual,
     Alpha,
     AlphaDash,
     AlphaNum,
+    Before,
+    BeforeOrEqual,
     Between,
     Boolean,
     Confirmed,
     CurrentPassword,
+    Date,
     ValidationError,
     StopValidation
 )
@@ -32,6 +39,41 @@ def test_accepted():
 
     try:
         accepted(False, '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_after():
+    future = datetime.strptime('2022-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+    after = After(future)
+    assert isinstance(after('2022-01-19 21:00:00', 'datetime', {}, request), datetime)
+
+    message = "Esta fecha es incorrecta"
+    date = After(future, format='%d/%m/%Y %H:%M:%S', message=message)
+    assert isinstance(date("12/01/2022 13:00:00", 'datetime', {}, request), datetime)
+
+    after = After(future)
+    try:
+        assert isinstance(date("01/01/2021 13:00:00", 'datetime', {}, request), datetime)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_after_or_equal():
+    future = datetime.strptime('2022-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+    after = AfterOrEqual(future)
+    assert isinstance(after('2022-01-01 00:00:00', 'datetime', {}, request), datetime)
+
+    message = "Esta fecha es incorrecta"
+    date = AfterOrEqual(future, format='%d/%m/%Y %H:%M:%S', message=message)
+    assert isinstance(date("01/01/2022 00:00:00", 'datetime', {}, request), datetime)
+    assert isinstance(date("02/01/2022 00:00:00", 'datetime', {}, request), datetime)
+
+    after = AfterOrEqual(future)
+    try:
+        assert isinstance(date("01/01/2021 13:00:00", 'datetime', {}, request), datetime)
         assert False
     except ValidationError as err:
         assert str(err) == message
@@ -76,6 +118,39 @@ def test_alpha_num():
 
     try:
         alpha_num("_-/", '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_before():
+    past = datetime.strptime('2022-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+    before = Before(past)
+    assert isinstance(before('2021-12-01 00:00:00', 'datetime', {}, request), datetime)
+
+    message = "Esta fecha es incorrecta"
+    before = Before(past, format='%d/%m/%Y %H:%M:%S', message=message)
+    assert isinstance(before("01/12/2021 00:00:00", 'datetime', {}, request), datetime)
+
+    try:
+        assert isinstance(before("02/01/2022 13:00:00", 'datetime', {}, request), datetime)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_before_or_equal():
+    past = datetime.strptime('2022-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+    before = BeforeOrEqual(past)
+    assert isinstance(before('2022-01-01 00:00:00', 'datetime', {}, request), datetime)
+    assert isinstance(before('2021-12-31 00:00:00', 'datetime', {}, request), datetime)
+
+    message = "Esta fecha es incorrecta"
+    before = BeforeOrEqual(past, format='%d/%m/%Y %H:%M:%S', message=message)
+    assert isinstance(before("01/01/2022 00:00:00", 'datetime', {}, request), datetime)
+
+    try:
+        assert isinstance(before("02/01/2022 00:00:00", 'datetime', {}, request), datetime)
         assert False
     except ValidationError as err:
         assert str(err) == message
@@ -158,6 +233,21 @@ def test_current_password():
 
     try:
         cp("secreto", 'password', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_date():
+    date = Date()
+    assert isinstance(date('2022-01-18', 'date', {}, request), datetime)
+
+    message = 'Este campo no es una fecha valida'
+    date = Date(format='%d/%m/%Y', message=message)
+    assert isinstance(date("12/01/2022", 'date', {}, request), datetime)
+
+    try:
+        date("2022-01-12", 'date', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message
