@@ -12,5 +12,9 @@ from .boolean import Boolean
 from .confirmed import Confirmed
 from .currentPassword import CurrentPassword
 from .date import Date
+from .dateEquals import DateEquals
+from .declined import Declined
+from .different import Different
+from .digits import Digits
 from .required import Required
 from .size import Size

@@ -14,6 +14,10 @@ from flaskFormRequest.validators import (
     Confirmed,
     CurrentPassword,
     Date,
+    DateEquals,
+    Declined,
+    Different,
+    Digits,
     ValidationError,
     StopValidation
 )
@@ -248,6 +252,72 @@ def test_date():
 
     try:
         date("2022-01-12", 'date', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_date_equals():
+    date0 = datetime.strptime('2022-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+    equals = DateEquals(date0)
+    assert isinstance(equals('2022-01-01 00:00:00', 'datetime', {}, request), datetime)
+
+    message = "Esta fecha es incorrecta"
+    equals = DateEquals(date0, format='%d/%m/%Y %H:%M:%S', message=message)
+    assert isinstance(equals("01/01/2022 00:00:00", 'datetime', {}, request), datetime)
+
+    try:
+        assert isinstance(equals("02/01/2022 00:00:00", 'datetime', {}, request), datetime)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_declined():
+    declined = Declined()
+    assert declined(False, '', {}, request) == False
+    assert declined(0, '', {}, request) == False
+    assert declined("no", '', {}, request) == False
+    assert declined("off", '', {}, request) == False
+
+    message = 'Este campo debe estar aceptado'
+
+    declined = Declined(message, parse=False)
+    assert declined(False, '', {}, request) == False
+    assert declined(0, '', {}, request) == 0
+    assert declined("no", '', {}, request) == "no"
+    assert declined("off", '', {}, request) == "off"
+
+    try:
+        declined(True, '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_different():
+    different = Different(field='foo')
+    assert different('zoo', '', {"foo": "bar"}, request) == 'zoo'
+
+    message = 'Este campo debe ser distinto a foo'
+    different = Different(field='foo', message=message)
+
+    try:
+        different('bar', '', {"foo": "bar"}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_digits():
+    digits = Digits(length=3)
+    assert digits("123", "", {}, request) == 123
+
+    message = "Este campo debe ser un numero de 3 digitos"
+    digits = Digits(length=3, message=message)
+
+    try:
+        digits('bar', '', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message
