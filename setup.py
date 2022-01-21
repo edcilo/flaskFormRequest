@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="flask-FormRequest",
-    version="0.0.15",
+    version="0.0.16",
     author="edcilo",
     description="Request validator for flask",
     long_description=long_description,
