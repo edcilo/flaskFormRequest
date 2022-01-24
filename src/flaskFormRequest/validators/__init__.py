@@ -16,5 +16,7 @@ from .dateEquals import DateEquals
 from .declined import Declined
 from .different import Different
 from .digits import Digits
+from .digitsBetween import DigitsBetween
+from .email import Email
 from .required import Required
 from .size import Size

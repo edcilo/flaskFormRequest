@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="flask-FormRequest",
-    version="0.0.16",
+    version="0.0.17",
     author="edcilo",
     description="Request validator for flask",
     long_description=long_description,
@@ -21,4 +21,7 @@ setuptools.setup(
     include_package_data=True,
     packages=['flaskFormRequest', 'flaskFormRequest.filters', 'flaskFormRequest.validators'],
     package_dir={'':'src'},
+    install_requires=[
+        'email-validator==1.1.3',
+    ],
 )

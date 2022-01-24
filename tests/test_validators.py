@@ -18,6 +18,8 @@ from flaskFormRequest.validators import (
     Declined,
     Different,
     Digits,
+    DigitsBetween,
+    Email,
     ValidationError,
     StopValidation
 )
@@ -318,6 +320,35 @@ def test_digits():
 
     try:
         digits('bar', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_digits_between():
+    digits = DigitsBetween(min=3, max=6)
+    assert digits("123", "", {}, request) == 123
+    assert digits("123456", "", {}, request) == 123456
+
+    message = "Este campo debe ser un numero entre 3 y 6 digitos"
+    digits = DigitsBetween(min=3, max=6, message=message)
+
+    try:
+        digits('12', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_email():
+    email = Email()
+    assert email('me@example.com', "", {}, request) == 'me@example.com'
+
+    message = "Este campo debe ser un email valido"
+    digits = Email(message=message)
+
+    try:
+        digits('12', '', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message
