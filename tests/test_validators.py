@@ -20,6 +20,8 @@ from flaskFormRequest.validators import (
     Digits,
     DigitsBetween,
     Email,
+    Exists,
+    File,
     ValidationError,
     StopValidation
 )

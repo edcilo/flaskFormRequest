@@ -18,5 +18,7 @@ from .different import Different
 from .digits import Digits
 from .digitsBetween import DigitsBetween
 from .email import Email
+from .exists import Exists
+from .file import File
 from .required import Required
 from .size import Size
