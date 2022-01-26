@@ -22,6 +22,7 @@ from flaskFormRequest.validators import (
     Email,
     Exists,
     File,
+    Size,
     ValidationError,
     StopValidation
 )
@@ -351,6 +352,25 @@ def test_email():
 
     try:
         digits('12', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_size():
+    size = Size(3)
+    assert size('foo', '', {}, request) == 'foo'
+    assert size([1,2,3], '', {}, request) == [1,2,3]
+    assert size((1,2,3), '', {}, request) == (1,2,3)
+    assert size({"foo": 0, "bar": 1, "zoo": 2}, '', {}, request) == {"foo": 0, "bar": 1, "zoo": 2}
+    assert size(123, '', {}, request) == 123
+    assert size(1.2, '', {}, request) == 1.2
+
+    message = "Este campo debe tener 5 caracteres"
+    size = Size(5, message=message)
+
+    try:
+        size('bar', '', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message
