@@ -26,3 +26,4 @@ from .notRegex import NotRegex
 from .regex import Regex
 from .required import Required
 from .size import Size
+from .unique import Unique
