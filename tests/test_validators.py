@@ -22,6 +22,10 @@ from flaskFormRequest.validators import (
     Email,
     Exists,
     File,
+    Max,
+    Min,
+    NotRegex,
+    Regex,
     Size,
     ValidationError,
     StopValidation
@@ -352,6 +356,72 @@ def test_email():
 
     try:
         digits('12', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_max():
+    max = Max(3)
+    assert max('foo', '', {}, request) == 'foo'
+    assert max([1,2,3], '', {}, request) == [1,2,3]
+    assert max((1,2,3), '', {}, request) == (1,2,3)
+    assert max({"foo": 0, "bar": 1, "zoo": 2}, '', {}, request) == {"foo": 0, "bar": 1, "zoo": 2}
+    assert max(123, '', {}, request) == 123
+    assert max(1.2, '', {}, request) == 1.2
+
+    message = "Este campo debe tener maximo 5 caracteres"
+    max = Max(5, message=message)
+
+    try:
+        max('foobar', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_min():
+    min = Min(3)
+    assert min('foo', '', {}, request) == 'foo'
+    assert min([1,2,3], '', {}, request) == [1,2,3]
+    assert min((1,2,3), '', {}, request) == (1,2,3)
+    assert min({"foo": 0, "bar": 1, "zoo": 2}, '', {}, request) == {"foo": 0, "bar": 1, "zoo": 2}
+    assert min(123, '', {}, request) == 123
+    assert min(1.2, '', {}, request) == 1.2
+
+    message = "Este campo debe tener minimo 5 caracteres"
+    min = Min(5, message=message)
+
+    try:
+        min('foo', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_not_regex():
+    regex = NotRegex(r'\d{9,15}$')
+    assert  regex('abc', '', {}, request) == 'abc'
+
+    message = "Este campo debe ser un numero de telefono valido"
+    regex = NotRegex(r'\d{9,15}$', message=message)
+
+    try:
+        regex('123123123', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_regex():
+    regex = Regex(r'\d{9,15}$')
+    assert  regex('123123123', '', {}, request) == '123123123'
+
+    message = "Este campo debe ser un numero de telefono valido"
+    regex = Regex(r'\d{9,15}$', message=message)
+
+    try:
+        regex('bar', '', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message

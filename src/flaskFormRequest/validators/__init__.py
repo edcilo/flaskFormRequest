@@ -20,5 +20,9 @@ from .digitsBetween import DigitsBetween
 from .email import Email
 from .exists import Exists
 from .file import File
+from .max import Max
+from .min import Min
+from .notRegex import NotRegex
+from .regex import Regex
 from .required import Required
 from .size import Size
