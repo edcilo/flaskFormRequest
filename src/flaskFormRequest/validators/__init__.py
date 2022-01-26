@@ -20,6 +20,8 @@ from .digitsBetween import DigitsBetween
 from .email import Email
 from .exists import Exists
 from .file import File
+from .inRule import In
+from .integer import Integer
 from .max import Max
 from .min import Min
 from .notRegex import NotRegex

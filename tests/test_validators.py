@@ -22,6 +22,8 @@ from flaskFormRequest.validators import (
     Email,
     Exists,
     File,
+    In,
+    Integer,
     Max,
     Min,
     NotRegex,
@@ -360,6 +362,39 @@ def test_email():
         digits('12', '', {}, request)
         assert False
     except ValidationError as err:
+        assert str(err) == message
+
+
+def test_in():
+    inrule = In(('foo', 'bar'))
+    assert inrule('foo', '', {}, request) == 'foo'
+
+    message = "Este atributo debe ser foo o bar"
+    inrule = In(('foo', 'bar'), message=message)
+
+    try:
+        inrule('zoo', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_integer():
+    integer = Integer()
+    assert integer('1', '', {}, request) == 1
+    assert integer('-1', '', {}, request) == -1
+    assert integer(2, '', {}, request) == 2
+
+    integer = Integer(parse=False)
+    assert integer('2', '', {}, request) == '2'
+
+    message = "Este atributo debe ser un numero entero"
+    integer = Integer(message=message)
+
+    try:
+        integer(3.1416, '', {}, request)
+        assert False
+    except StopValidation as err:
         assert str(err) == message
 
 
