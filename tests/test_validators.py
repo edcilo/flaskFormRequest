@@ -25,8 +25,10 @@ from flaskFormRequest.validators import (
     Max,
     Min,
     NotRegex,
+    Nullable,
     Regex,
     Size,
+    NoneValueException,
     ValidationError,
     StopValidation
 )
@@ -411,6 +413,17 @@ def test_not_regex():
         assert False
     except ValidationError as err:
         assert str(err) == message
+
+
+def test_nullable():
+    nullable = Nullable()
+    assert nullable('foo', '', {}, request) == 'foo'
+
+    try:
+        assert nullable(None, '', {}, request) == None
+        assert False
+    except NoneValueException:
+        assert True
 
 
 def test_regex():

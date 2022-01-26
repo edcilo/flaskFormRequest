@@ -12,6 +12,11 @@ class StopValidation(Exception):
         Exception.__init__(self, message, *args, **kwargs)
 
 
+class NoneValueException(Exception):
+    def __init__(self, message="", *args, **kwargs):
+        Exception.__init__(self, message, *args, **kwargs)
+
+
 class Validator(abc.ABC):
     def __init__(self, message: Union[str, None] = None, parse: bool = True) -> None:
         self.data = {}
