@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID as UUIDHelper
 from email import message
 from flaskFormRequest.validators import (
     Accepted,
@@ -22,6 +23,7 @@ from flaskFormRequest.validators import (
     Email,
     Exists,
     File,
+    Float,
     In,
     Integer,
     Max,
@@ -30,6 +32,8 @@ from flaskFormRequest.validators import (
     Nullable,
     Regex,
     Size,
+    Unique,
+    UUID,
     NoneValueException,
     ValidationError,
     StopValidation
@@ -365,6 +369,23 @@ def test_email():
         assert str(err) == message
 
 
+def test_float():
+    floatRule = Float()
+    assert floatRule("3.14", '', {}, request) == 3.14
+    assert floatRule(3.14, '', {}, request) == 3.14
+    assert floatRule(1, '', {}, request) == 1.0
+
+    message = "Este campo deber ser de tipo flotante"
+    floatRule = Float(message=message, parse=False)
+    assert floatRule("3.14", '', {}, request) == "3.14"
+
+    try:
+        floatRule('foo', '', {}, request)
+        assert False
+    except StopValidation as err:
+        assert str(err) == message
+
+
 def test_in():
     inrule = In(('foo', 'bar'))
     assert inrule('foo', '', {}, request) == 'foo'
@@ -491,4 +512,23 @@ def test_size():
         size('bar', '', {}, request)
         assert False
     except ValidationError as err:
+        assert str(err) == message
+
+
+def test_uuid():
+    uuidRule = UUID()
+    assert isinstance(
+        uuidRule('553adce2-2261-458f-aa6c-9b766ccb7a49', '', {}, request),
+        UUIDHelper
+    )
+
+    message = "Este campo debe ser un UUID valido"
+    uuidRule = UUID(message=message, parse=False)
+
+    assert uuidRule('553adce2-2261-458f-aa6c-9b766ccb7a49', '', {}, request) == '553adce2-2261-458f-aa6c-9b766ccb7a49'
+
+    try:
+        uuidRule('bar', '', {}, request)
+        assert False
+    except StopValidation as err:
         assert str(err) == message

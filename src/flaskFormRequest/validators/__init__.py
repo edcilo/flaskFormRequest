@@ -20,6 +20,7 @@ from .digitsBetween import DigitsBetween
 from .email import Email
 from .exists import Exists
 from .file import File
+from .float import Float
 from .inRule import In
 from .integer import Integer
 from .max import Max
@@ -29,4 +30,5 @@ from .nullable import Nullable
 from .regex import Regex
 from .required import Required
 from .size import Size
+from .uuid import UUID
 from .unique import Unique
