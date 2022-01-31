@@ -23,7 +23,10 @@ from flaskFormRequest.validators import (
     Email,
     Exists,
     File,
+    Filled,
     Float,
+    Gt,
+    Gte,
     In,
     Integer,
     Max,
@@ -383,6 +386,53 @@ def test_float():
         floatRule('foo', '', {}, request)
         assert False
     except StopValidation as err:
+        assert str(err) == message
+
+
+def test_filled():
+    filled = Filled()
+    assert filled('foo', '', {}, request) == 'foo'
+    assert filled([0, 1, 2], '', {}, request) == [0, 1, 2]
+    assert filled((0, 1, 2), '', {}, request) == (0, 1, 2)
+    assert filled({"foo": "bar"}, '', {}, request) == {"foo": "bar"}
+
+    message = "Este campo debe tener un valor"
+    filled = Filled(message=message)
+
+    try:
+        filled([], '', {}, request)
+        assert False
+    except StopValidation as err:
+        assert str(err) == message
+
+
+def test_gt():
+    gt = Gt(length=2)
+    assert gt('foo', '', {}, request) == 'foo'
+    assert gt([1,2,3], '', {}, request) == [1,2,3]
+
+    message = "Este campo debe tener mas de 3 caracteres"
+    gt = Gt(length=2, message=message)
+
+    try:
+        gt([], '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_gte():
+    gte = Gte(length=3)
+    assert gte('foo', '', {}, request) == 'foo'
+    assert gte([1,2,3], '', {}, request) == [1,2,3]
+
+    message = "Este campo debe tener 3 o más caracteres"
+    gte = Gte(length=3, message=message)
+
+    try:
+        gte([1, 2], '', {}, request)
+        assert False
+    except ValidationError as err:
         assert str(err) == message
 
 

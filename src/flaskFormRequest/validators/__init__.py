@@ -23,6 +23,9 @@ from .file import File
 from .float import Float
 from .inRule import In
 from .integer import Integer
+from .filled import Filled
+from .gt import Gt
+from .gte import Gte
 from .max import Max
 from .min import Min
 from .notRegex import NotRegex
