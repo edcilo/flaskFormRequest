@@ -1,6 +1,5 @@
 from datetime import datetime
 from uuid import UUID as UUIDHelper
-from email import message
 from flaskFormRequest.validators import (
     Accepted,
     After,
@@ -29,6 +28,11 @@ from flaskFormRequest.validators import (
     Gte,
     In,
     Integer,
+    IP,
+    Json,
+    Lt,
+    Lte,
+    MacAddress,
     Max,
     Min,
     NotRegex,
@@ -466,6 +470,94 @@ def test_integer():
         integer(3.1416, '', {}, request)
         assert False
     except StopValidation as err:
+        assert str(err) == message
+
+
+def test_ip():
+    ip = IP()
+    assert ip("192.168.1.0", '', {}, request) == "192.168.1.0"
+    assert ip("0.0.0.0", '', {}, request) == "0.0.0.0"
+    assert ip("255.255.255.255", '', {}, request) == "255.255.255.255"
+
+    ip = IP('v6')
+    assert ip("2001:db8:85a3:8d3:1319:8a2e:370:7348", '', {}, request) == "2001:db8:85a3:8d3:1319:8a2e:370:7348"
+
+    message = "Este atributo debe ser una IP valida"
+    ip = IP(version='v4', message=message)
+    try:
+        ip("300.0.0.0", '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+    message = "Este atributo debe ser una IP v6 valida"
+    ip = IP(version='v6', message=message)
+    try:
+        ip("127.0.0.1", '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_json():
+    jsonVal = Json()
+    assert jsonVal("{}", '', {}, request) == {}
+    assert jsonVal('{"foo": "bar"}', '', {}, request) == {"foo": "bar"}
+
+    jsonVal = Json(parse=False)
+    assert jsonVal("{}", '', {}, request) == "{}"
+    assert jsonVal('{"foo": "bar"}', '', {}, request) == '{"foo": "bar"}'
+
+    message = "Este campo debe ser un json valido"
+    jsonVal = Json(message=message)
+    try:
+        jsonVal('{"foo": "bar",}', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_lt():
+    lt= Lt(length=4)
+    assert lt('foo', '', {}, request) == 'foo'
+    assert lt([1,2,3], '', {}, request) == [1,2,3]
+
+    message = "Este campo debe tener menos de 1 caracteres"
+    lt = Lt(length=1, message=message)
+
+    try:
+        lt([0], '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_lte():
+    lte = Lte(length=3)
+    assert lte('foo', '', {}, request) == 'foo'
+    assert lte([1,2], '', {}, request) == [1,2]
+
+    message = "Este campo debe tener 2 o menos caracteres"
+    lte = Lte(length=2, message=message)
+
+    try:
+        lte([1, 2, 3], '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_mac_address():
+    macAddress = MacAddress()
+    assert macAddress("AA:BB:CC:DD:EE:FF", '', {}, request) == "AA:BB:CC:DD:EE:FF"
+    assert macAddress("AA-BB-CC-DD-EE-FF", '', {}, request) == "AA-BB-CC-DD-EE-FF"
+
+    message = "Este atributo debe ser una MacAddress"
+    macAddress = MacAddress(message=message)
+    try:
+        macAddress("abc", '', {}, request)
+        assert False
+    except ValidationError as err:
         assert str(err) == message
 
 
