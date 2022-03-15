@@ -35,6 +35,7 @@ from flaskFormRequest.validators import (
     MacAddress,
     Max,
     Min,
+    NotIn,
     NotRegex,
     Nullable,
     Regex,
@@ -594,6 +595,20 @@ def test_min():
 
     try:
         min('foo', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_not_in():
+    notinrule = NotIn(('foo', 'bar'))
+    assert notinrule('zoo', '', {}, request) == 'zoo'
+
+    message = "Este atributo no debe ser foo o bar"
+    notinrule = NotIn(('foo', 'bar'), message=message)
+
+    try:
+        notinrule('foo', '', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message

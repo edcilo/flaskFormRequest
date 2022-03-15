@@ -32,7 +32,9 @@ from .lt import Lt
 from .lte import Lte
 from .macAddress import MacAddress
 from .max import Max
+from .mimeTypes import MimeTypes
 from .min import Min
+from .notIn import NotIn
 from .notRegex import NotRegex
 from .nullable import Nullable
 from .regex import Regex
