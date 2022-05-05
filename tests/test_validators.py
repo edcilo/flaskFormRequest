@@ -41,6 +41,7 @@ from flaskFormRequest.validators import (
     Nullable,
     Regex,
     Size,
+    String,
     Unique,
     UUID,
     CollectionErrors,
@@ -701,6 +702,30 @@ def test_size():
         assert False
     except ValidationError as err:
         assert str(err) == message
+
+
+def test_string():
+    string = String()
+    assert string('foo', '', {}, request) == "foo"
+    assert string(None, '', {}, request) == "None"
+    assert string(True, '', {}, request) == "True"
+    assert string(123, '', {}, request) == "123"
+    assert string(12.3, '', {}, request) == "12.3"
+    assert string((1,2,), '', {}, request) == "(1, 2)"
+    assert string([1,2,], '', {}, request) == "[1, 2]"
+    assert string({"foo": 0,}, '', {}, request) == "{'foo': 0}"
+
+    string = String(parse=False)
+    assert string(1, '', {}, request) == 1
+
+    message = "Este atributo debe ser un numero entero"
+    string = String(message=message)
+
+    # try:
+    #     string(test_size, '', {}, request)
+    #     assert False
+    # except StopValidation as err:
+    #     assert str(err) == message
 
 
 def test_uuid():

@@ -40,5 +40,6 @@ from .nullable import Nullable
 from .regex import Regex
 from .required import Required
 from .size import Size
+from .string import String
 from .uuid import UUID
 from .unique import Unique
