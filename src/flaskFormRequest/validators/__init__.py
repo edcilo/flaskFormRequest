@@ -34,6 +34,7 @@ from .lte import Lte
 from .macAddress import MacAddress
 from .max import Max
 from .min import Min
+from .notInRule import NotIn
 from .notRegex import NotRegex
 from .nullable import Nullable
 from .regex import Regex
