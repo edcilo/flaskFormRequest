@@ -18,6 +18,7 @@ from .declined import Declined
 from .different import Different
 from .digits import Digits
 from .digitsBetween import DigitsBetween
+from .distinct import Distinct
 from .email import Email
 from .exists import Exists
 from .file import File
@@ -37,6 +38,7 @@ from .min import Min
 from .notInRule import NotIn
 from .notRegex import NotRegex
 from .nullable import Nullable
+from .prohibited import Prohibited
 from .regex import Regex
 from .required import Required
 from .same import Same

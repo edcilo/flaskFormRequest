@@ -20,6 +20,7 @@ from flaskFormRequest.validators import (
     Different,
     Digits,
     DigitsBetween,
+    Distinct,
     Email,
     Exists,
     File,
@@ -39,6 +40,7 @@ from flaskFormRequest.validators import (
     NotIn,
     NotRegex,
     Nullable,
+    Prohibited,
     Regex,
     Same,
     Size,
@@ -390,6 +392,20 @@ def test_digits_between():
         assert str(err) == message
 
 
+def test_distinct():
+    distinct = Distinct()
+    assert distinct([1, 2, 3, 4, 5], "", {}, request) == [1, 2, 3, 4, 5]
+
+    message = "Los elementos en la lista deben ser unicos"
+    distinct = Distinct(message=message)
+
+    try:
+        distinct([1, 2, 1, 2, 1, 3, 4], '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
 def test_email():
     email = Email()
     assert email('me@example.com', "", {}, request) == 'me@example.com'
@@ -670,6 +686,23 @@ def test_nullable():
         assert False
     except NoneValueException:
         assert True
+
+
+def test_prohibited():
+    prohibited = Prohibited()
+    assert prohibited(None, '', {}, request) == None
+    assert prohibited("", '', {}, request) == ""
+    assert prohibited([], '', {}, request) == []
+    assert prohibited(tuple(), '', {}, request) == tuple()
+    assert prohibited({}, '', {}, request) == {}
+
+    message = "Este campo debe estar vacío"
+    prohibited = Prohibited(message=message)
+    try:
+        prohibited(True, '', {}, request)
+        assert False
+    except StopValidation as err:
+        assert str(err) == message
 
 
 def test_regex():
