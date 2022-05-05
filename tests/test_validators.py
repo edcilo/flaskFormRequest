@@ -36,6 +36,7 @@ from flaskFormRequest.validators import (
     MacAddress,
     Max,
     Min,
+    NotIn,
     NotRegex,
     Nullable,
     Regex,
@@ -438,6 +439,7 @@ def test_filled():
 def test_gt():
     gt = Gt(length=2)
     assert gt('foo', '', {}, request) == 'foo'
+    assert gt(3, '', {}, request) == 3
     assert gt([1,2,3], '', {}, request) == [1,2,3]
 
     message = "Este campo debe tener mas de 3 caracteres"
@@ -453,6 +455,8 @@ def test_gt():
 def test_gte():
     gte = Gte(length=3)
     assert gte('foo', '', {}, request) == 'foo'
+    assert gte(3, '', {}, request) == 3
+    assert gte(4, '', {}, request) == 4
     assert gte([1,2,3], '', {}, request) == [1,2,3]
 
     message = "Este campo debe tener 3 o más caracteres"
@@ -545,6 +549,7 @@ def test_json():
 def test_lt():
     lt= Lt(length=4)
     assert lt('foo', '', {}, request) == 'foo'
+    assert lt(3, '', {}, request) == 3
     assert lt([1,2,3], '', {}, request) == [1,2,3]
 
     message = "Este campo debe tener menos de 1 caracteres"
@@ -560,6 +565,8 @@ def test_lt():
 def test_lte():
     lte = Lte(length=3)
     assert lte('foo', '', {}, request) == 'foo'
+    assert lte(3, '', {}, request) == 3
+    assert lte(2, '', {}, request) == 2
     assert lte([1,2], '', {}, request) == [1,2]
 
     message = "Este campo debe tener 2 o menos caracteres"
@@ -592,8 +599,8 @@ def test_max():
     assert max([1,2,3], '', {}, request) == [1,2,3]
     assert max((1,2,3), '', {}, request) == (1,2,3)
     assert max({"foo": 0, "bar": 1, "zoo": 2}, '', {}, request) == {"foo": 0, "bar": 1, "zoo": 2}
-    assert max(123, '', {}, request) == 123
-    assert max(1.2, '', {}, request) == 1.2
+    assert max(3, '', {}, request) == 3
+    assert max(3.0, '', {}, request) == 3.0
 
     message = "Este campo debe tener maximo 5 caracteres"
     max = Max(5, message=message)
@@ -611,14 +618,28 @@ def test_min():
     assert min([1,2,3], '', {}, request) == [1,2,3]
     assert min((1,2,3), '', {}, request) == (1,2,3)
     assert min({"foo": 0, "bar": 1, "zoo": 2}, '', {}, request) == {"foo": 0, "bar": 1, "zoo": 2}
-    assert min(123, '', {}, request) == 123
-    assert min(1.2, '', {}, request) == 1.2
+    assert min(3, '', {}, request) == 3
+    assert min(3.0, '', {}, request) == 3.0
 
     message = "Este campo debe tener minimo 5 caracteres"
     min = Min(5, message=message)
 
     try:
         min('foo', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_not_in():
+    notinrule = NotIn(('foo', 'bar'))
+    assert notinrule('zoo', '', {}, request) == 'zoo'
+
+    message = "Este atributo no debe ser foo o bar"
+    notinrule = NotIn(('foo', 'bar'), message=message)
+
+    try:
+        notinrule('foo', '', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message
@@ -669,8 +690,8 @@ def test_size():
     assert size([1,2,3], '', {}, request) == [1,2,3]
     assert size((1,2,3), '', {}, request) == (1,2,3)
     assert size({"foo": 0, "bar": 1, "zoo": 2}, '', {}, request) == {"foo": 0, "bar": 1, "zoo": 2}
-    assert size(123, '', {}, request) == 123
-    assert size(1.2, '', {}, request) == 1.2
+    assert size(3, '', {}, request) == 3
+    assert size(3.0, '', {}, request) == 3.0
 
     message = "Este campo debe tener 5 caracteres"
     size = Size(5, message=message)
