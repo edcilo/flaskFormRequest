@@ -39,6 +39,8 @@ class Array(Validator):
                         break
                     except ValidationError as err:
                         errors.append(str(err))
+                    except CollectionErrors as err:
+                        errors.append(err.errors)
                     except NoneValueException:
                         break
                 if len(errors) > 0:
