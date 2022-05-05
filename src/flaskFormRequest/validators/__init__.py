@@ -1,4 +1,4 @@
-from .validator import NoneValueException, Validator, ValidationError, StopValidation
+from .validator import CollectionErrors, NoneValueException, Validator, ValidationError, StopValidation
 from .accepted import Accepted
 from .after import After
 from .afterOrEqual import AfterOrEqual

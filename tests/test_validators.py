@@ -42,6 +42,7 @@ from flaskFormRequest.validators import (
     Size,
     Unique,
     UUID,
+    CollectionErrors,
     NoneValueException,
     ValidationError,
     StopValidation
@@ -155,16 +156,24 @@ def test_alpha_num():
 def test_array():
     array = Array()
     assert array([0, 1,], 'listfield', {}, request) == [0, 1,]
-    assert array((0, 1,), 'tuplefield', {}, request) == (0, 1,)
+    array = Array(rules=[Nullable(), Boolean()])
+    assert array([0, 1,], 'listfield', {}, request) == [False, True]
+    assert array([0, True, None], 'listfield', {}, request) == [False, True, None]
     
     message = 'Este campo debe ser una lista o una tupla'
     array = Array(message)
-
     try:
         array("foo", 'stringfield', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message
+
+    array = Array(rules=[Nullable(), Boolean()])
+    try:
+        array([True, "foo", False, "bar", None], 'listfield', {}, request)
+        assert False
+    except CollectionErrors as err:
+        assert isinstance(err.errors, dict)
 
 
 def test_before():

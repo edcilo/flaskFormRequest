@@ -4,7 +4,8 @@ from .filters import strip_filter
 from .validators import (
     NoneValueException,
     StopValidation,
-    ValidationError
+    ValidationError,
+    CollectionErrors
 )
 
 
@@ -59,6 +60,8 @@ class FormRequest(abc.ABC):
                     break
                 except ValidationError as err:
                     errors.append(str(err))
+                except CollectionErrors as err:
+                    errors.append(err.errors)
                 except NoneValueException:
                     break
             if len(errors) > 0:
