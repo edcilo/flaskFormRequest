@@ -5,6 +5,7 @@ from .afterOrEqual import AfterOrEqual
 from .alpha import Alpha
 from .alphaDash import AlphaDash
 from .alphaNum import AlphaNum
+from .array import Array
 from .before import Before
 from .beforeOrEqual import BeforeOrEqual
 from .between import Between

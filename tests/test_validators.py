@@ -7,6 +7,7 @@ from flaskFormRequest.validators import (
     Alpha,
     AlphaDash,
     AlphaNum,
+    Array,
     Before,
     BeforeOrEqual,
     Between,
@@ -146,6 +147,21 @@ def test_alpha_num():
 
     try:
         alpha_num("_-/", '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_array():
+    array = Array()
+    assert array([0, 1,], 'listfield', {}, request) == [0, 1,]
+    assert array((0, 1,), 'tuplefield', {}, request) == (0, 1,)
+    
+    message = 'Este campo debe ser una lista o una tupla'
+    array = Array(message)
+
+    try:
+        array("foo", 'stringfield', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message
