@@ -40,6 +40,7 @@ from flaskFormRequest.validators import (
     NotRegex,
     Nullable,
     Regex,
+    Same,
     Size,
     String,
     Unique,
@@ -680,6 +681,20 @@ def test_regex():
 
     try:
         regex('bar', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_same():
+    same = Same("foo")
+    assert same('foo', '', {}, request) == 'foo'
+
+    message = "Este campo debe ser igual a bar"
+    same_ = Same("bar", message=message)
+
+    try:
+        same_('foo', '', {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message

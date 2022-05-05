@@ -39,6 +39,7 @@ from .notRegex import NotRegex
 from .nullable import Nullable
 from .regex import Regex
 from .required import Required
+from .same import Same
 from .size import Size
 from .string import String
 from .uuid import UUID
