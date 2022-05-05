@@ -10,5 +10,5 @@ class AlphaDash(Validator):
 
     def handler(self, value, field, request):
         value = str(value)
-        if not re.match('^[\w-]+$', value):
+        if not re.match('^[\\w-]+$', value):
             raise ValidationError(self.message)
