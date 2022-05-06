@@ -12,6 +12,7 @@ from flaskFormRequest.validators import (
     BeforeOrEqual,
     Between,
     Boolean,
+    Callable,
     Confirmed,
     CurrentPassword,
     Date,
@@ -41,6 +42,7 @@ from flaskFormRequest.validators import (
     NotRegex,
     Nullable,
     Prohibited,
+    Numeric,
     Regex,
     Same,
     Size,
@@ -257,6 +259,24 @@ def test_boolean():
 
     try:
         boolean("foo", '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
+def test_callable():
+    def custom_rule(value, field, request):
+        return True
+    call = Callable(custom_rule)
+    assert call("foo", "", {}, request) == "foo"
+
+    def custom_rule(value, field, request):
+        return False
+    message = "Este campo es incorrecto"
+    call = Callable(custom_rule, message=message)
+
+    try:
+        call("foo", "", {}, request)
         assert False
     except ValidationError as err:
         assert str(err) == message
@@ -702,6 +722,21 @@ def test_prohibited():
         prohibited(True, '', {}, request)
         assert False
     except StopValidation as err:
+        assert str(err) == message
+
+
+def test_numeric():
+    numeric = Numeric()
+    assert numeric("3", '', {}, request) == 3
+    assert numeric("3.14", '', {}, request) == 3.14
+
+    message = "Este campo debe ser numerico"
+    numeric = Numeric(message=message)
+
+    try:
+        numeric('foo', '', {}, request)
+        assert False
+    except ValidationError as err:
         assert str(err) == message
 
 

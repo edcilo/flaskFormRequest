@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Union
 from .validator import Validator, ValidationError, StopValidation
 
@@ -8,5 +9,5 @@ class Required(Validator):
         self.message = message or 'This field is required'
 
     def handler(self, value, field, request):
-        if value is None or len(value) == 0:
+        if value is None or (isinstance(value, Iterable) and len(value) == 0):
             raise StopValidation(self.message)

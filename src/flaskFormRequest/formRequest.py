@@ -31,7 +31,10 @@ class FormRequest(abc.ABC):
         return self._request
 
     def load_data(self):
-        json_data = self._request.json or {}
+        try:
+            json_data = self._request.json
+        except:
+            json_data = {}
         get_post_data = self._request.values.to_dict()
         files_data = self._request.files.to_dict()
 

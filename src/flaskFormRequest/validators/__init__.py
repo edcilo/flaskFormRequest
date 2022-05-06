@@ -10,6 +10,7 @@ from .before import Before
 from .beforeOrEqual import BeforeOrEqual
 from .between import Between
 from .boolean import Boolean
+from .callable import Callable
 from .confirmed import Confirmed
 from .currentPassword import CurrentPassword
 from .date import Date
@@ -40,6 +41,7 @@ from .notInRule import NotIn
 from .notRegex import NotRegex
 from .nullable import Nullable
 from .prohibited import Prohibited
+from .numeric import Numeric
 from .regex import Regex
 from .required import Required
 from .same import Same
