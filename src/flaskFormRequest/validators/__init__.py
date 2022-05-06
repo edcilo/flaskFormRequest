@@ -36,7 +36,7 @@ from .macAddress import MacAddress
 from .max import Max
 from .mimeTypes import MimeTypes
 from .min import Min
-
+from .notInRule import NotIn
 from .notRegex import NotRegex
 from .nullable import Nullable
 from .prohibited import Prohibited

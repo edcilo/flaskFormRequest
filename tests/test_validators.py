@@ -164,7 +164,7 @@ def test_array():
     array = Array(rules=[Nullable(), Boolean()])
     assert array([0, 1,], 'listfield', {}, request) == [False, True]
     assert array([0, True, None], 'listfield', {}, request) == [False, True, None]
-    
+
     message = 'Este campo debe ser una lista o una tupla'
     array = Array(message)
     try:
