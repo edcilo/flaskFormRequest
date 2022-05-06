@@ -7,6 +7,7 @@ from flaskFormRequest.validators import (
     Alpha,
     AlphaDash,
     AlphaNum,
+    Array,
     Before,
     BeforeOrEqual,
     Between,
@@ -19,6 +20,7 @@ from flaskFormRequest.validators import (
     Different,
     Digits,
     DigitsBetween,
+    Distinct,
     Email,
     Exists,
     File,
@@ -38,10 +40,14 @@ from flaskFormRequest.validators import (
     NotIn,
     NotRegex,
     Nullable,
+    Prohibited,
     Regex,
+    Same,
     Size,
+    String,
     Unique,
     UUID,
+    CollectionErrors,
     NoneValueException,
     ValidationError,
     StopValidation
@@ -150,6 +156,29 @@ def test_alpha_num():
         assert False
     except ValidationError as err:
         assert str(err) == message
+
+
+def test_array():
+    array = Array()
+    assert array([0, 1,], 'listfield', {}, request) == [0, 1,]
+    array = Array(rules=[Nullable(), Boolean()])
+    assert array([0, 1,], 'listfield', {}, request) == [False, True]
+    assert array([0, True, None], 'listfield', {}, request) == [False, True, None]
+    
+    message = 'Este campo debe ser una lista o una tupla'
+    array = Array(message)
+    try:
+        array("foo", 'stringfield', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+    array = Array(rules=[Nullable(), Boolean()])
+    try:
+        array([True, "foo", False, "bar", None], 'listfield', {}, request)
+        assert False
+    except CollectionErrors as err:
+        assert isinstance(err.errors, dict)
 
 
 def test_before():
@@ -363,6 +392,20 @@ def test_digits_between():
         assert str(err) == message
 
 
+def test_distinct():
+    distinct = Distinct()
+    assert distinct([1, 2, 3, 4, 5], "", {}, request) == [1, 2, 3, 4, 5]
+
+    message = "Los elementos en la lista deben ser unicos"
+    distinct = Distinct(message=message)
+
+    try:
+        distinct([1, 2, 1, 2, 1, 3, 4], '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
 def test_email():
     email = Email()
     assert email('me@example.com', "", {}, request) == 'me@example.com'
@@ -414,6 +457,7 @@ def test_filled():
 def test_gt():
     gt = Gt(length=2)
     assert gt('foo', '', {}, request) == 'foo'
+    assert gt(3, '', {}, request) == 3
     assert gt([1,2,3], '', {}, request) == [1,2,3]
 
     message = "Este campo debe tener mas de 3 caracteres"
@@ -429,6 +473,8 @@ def test_gt():
 def test_gte():
     gte = Gte(length=3)
     assert gte('foo', '', {}, request) == 'foo'
+    assert gte(3, '', {}, request) == 3
+    assert gte(4, '', {}, request) == 4
     assert gte([1,2,3], '', {}, request) == [1,2,3]
 
     message = "Este campo debe tener 3 o más caracteres"
@@ -521,6 +567,7 @@ def test_json():
 def test_lt():
     lt= Lt(length=4)
     assert lt('foo', '', {}, request) == 'foo'
+    assert lt(3, '', {}, request) == 3
     assert lt([1,2,3], '', {}, request) == [1,2,3]
 
     message = "Este campo debe tener menos de 1 caracteres"
@@ -536,6 +583,8 @@ def test_lt():
 def test_lte():
     lte = Lte(length=3)
     assert lte('foo', '', {}, request) == 'foo'
+    assert lte(3, '', {}, request) == 3
+    assert lte(2, '', {}, request) == 2
     assert lte([1,2], '', {}, request) == [1,2]
 
     message = "Este campo debe tener 2 o menos caracteres"
@@ -568,8 +617,8 @@ def test_max():
     assert max([1,2,3], '', {}, request) == [1,2,3]
     assert max((1,2,3), '', {}, request) == (1,2,3)
     assert max({"foo": 0, "bar": 1, "zoo": 2}, '', {}, request) == {"foo": 0, "bar": 1, "zoo": 2}
-    assert max(123, '', {}, request) == 123
-    assert max(1.2, '', {}, request) == 1.2
+    assert max(3, '', {}, request) == 3
+    assert max(3.0, '', {}, request) == 3.0
 
     message = "Este campo debe tener maximo 5 caracteres"
     max = Max(5, message=message)
@@ -587,8 +636,8 @@ def test_min():
     assert min([1,2,3], '', {}, request) == [1,2,3]
     assert min((1,2,3), '', {}, request) == (1,2,3)
     assert min({"foo": 0, "bar": 1, "zoo": 2}, '', {}, request) == {"foo": 0, "bar": 1, "zoo": 2}
-    assert min(123, '', {}, request) == 123
-    assert min(1.2, '', {}, request) == 1.2
+    assert min(3, '', {}, request) == 3
+    assert min(3.0, '', {}, request) == 3.0
 
     message = "Este campo debe tener minimo 5 caracteres"
     min = Min(5, message=message)
@@ -639,6 +688,23 @@ def test_nullable():
         assert True
 
 
+def test_prohibited():
+    prohibited = Prohibited()
+    assert prohibited(None, '', {}, request) == None
+    assert prohibited("", '', {}, request) == ""
+    assert prohibited([], '', {}, request) == []
+    assert prohibited(tuple(), '', {}, request) == tuple()
+    assert prohibited({}, '', {}, request) == {}
+
+    message = "Este campo debe estar vacío"
+    prohibited = Prohibited(message=message)
+    try:
+        prohibited(True, '', {}, request)
+        assert False
+    except StopValidation as err:
+        assert str(err) == message
+
+
 def test_regex():
     regex = Regex(r'\d{9,15}$')
     assert  regex('123123123', '', {}, request) == '123123123'
@@ -653,14 +719,28 @@ def test_regex():
         assert str(err) == message
 
 
+def test_same():
+    same = Same("foo")
+    assert same('foo', '', {}, request) == 'foo'
+
+    message = "Este campo debe ser igual a bar"
+    same_ = Same("bar", message=message)
+
+    try:
+        same_('foo', '', {}, request)
+        assert False
+    except ValidationError as err:
+        assert str(err) == message
+
+
 def test_size():
     size = Size(3)
     assert size('foo', '', {}, request) == 'foo'
     assert size([1,2,3], '', {}, request) == [1,2,3]
     assert size((1,2,3), '', {}, request) == (1,2,3)
     assert size({"foo": 0, "bar": 1, "zoo": 2}, '', {}, request) == {"foo": 0, "bar": 1, "zoo": 2}
-    assert size(123, '', {}, request) == 123
-    assert size(1.2, '', {}, request) == 1.2
+    assert size(3, '', {}, request) == 3
+    assert size(3.0, '', {}, request) == 3.0
 
     message = "Este campo debe tener 5 caracteres"
     size = Size(5, message=message)
@@ -670,6 +750,30 @@ def test_size():
         assert False
     except ValidationError as err:
         assert str(err) == message
+
+
+def test_string():
+    string = String()
+    assert string('foo', '', {}, request) == "foo"
+    assert string(None, '', {}, request) == "None"
+    assert string(True, '', {}, request) == "True"
+    assert string(123, '', {}, request) == "123"
+    assert string(12.3, '', {}, request) == "12.3"
+    assert string((1,2,), '', {}, request) == "(1, 2)"
+    assert string([1,2,], '', {}, request) == "[1, 2]"
+    assert string({"foo": 0,}, '', {}, request) == "{'foo': 0}"
+
+    string = String(parse=False)
+    assert string(1, '', {}, request) == 1
+
+    message = "Este atributo debe ser un numero entero"
+    string = String(message=message)
+
+    # try:
+    #     string(test_size, '', {}, request)
+    #     assert False
+    # except StopValidation as err:
+    #     assert str(err) == message
 
 
 def test_uuid():

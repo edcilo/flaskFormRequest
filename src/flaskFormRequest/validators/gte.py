@@ -10,10 +10,12 @@ class Gte(Validator):
         self.message = message or 'This field is not valid.'
 
     def handler(self, value, field, request):
-        if isinstance(value, int) or isinstance(value, float):
-            value = str(value)
-
+        hasError = False
         # TODO: implement support for files
-
-        if len(value) < self.size:
+        if isinstance(value, int) or isinstance(value, float):
+            hasError = value < self.size
+        else:
+            hasError = len(value) < self.size
+        
+        if hasError:
             raise ValidationError(self.message)
