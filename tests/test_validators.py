@@ -44,6 +44,7 @@ from flaskFormRequest.validators import (
     Prohibited,
     Numeric,
     Regex,
+    Required,
     Same,
     Size,
     String,
@@ -570,6 +571,21 @@ def test_json():
     jsonVal = Json()
     assert jsonVal("{}", '', {}, request) == {}
     assert jsonVal('{"foo": "bar"}', '', {}, request) == {"foo": "bar"}
+
+    try:
+        jsonVal = Json(rules={
+            "foo": [Required(), Integer()],
+            "bar": [Required()],
+            "zoo": [Json(rules={
+                "zing": [Required(), Integer()],
+                "foo": [Json(rules={
+                    "bar": [Required(), Integer()]
+                })]
+            })]
+        })
+        jsonVal('{"foo": "0", "bar": "world", "zoo": {"zing": "1", "foo": {"bar": "3"}}}', '', {}, request) == {"foo": "bar"}
+    except CollectionErrors as err:
+        assert False
 
     jsonVal = Json(parse=False)
     assert jsonVal("{}", '', {}, request) == "{}"

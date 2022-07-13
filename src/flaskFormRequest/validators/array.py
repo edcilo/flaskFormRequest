@@ -1,18 +1,17 @@
-import json
 from typing import Union
 from .validator import (
-    CollectionErrors, 
-    NoneValueException, 
-    Validator, 
-    ValidationError, 
+    CollectionErrors,
+    NoneValueException,
+    Validator,
+    ValidationError,
     StopValidation
 )
 
 
 class Array(Validator):
-    def __init__(self, 
-                 message: Union[str, None] = None, 
-                 parse: bool = True, 
+    def __init__(self,
+                 message: Union[str, None] = None,
+                 parse: bool = True,
                  rules: Union[list, tuple, None] = None) -> None:
         self.parse = parse
         self.message = message or 'This field must be a list or tuple.'
